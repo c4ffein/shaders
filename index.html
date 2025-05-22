@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShaderToy Fullscreen Viewer</title>
+  <style>
+    #controls {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 5px;
+      color: white;
+      font-family: monospace;
+    }
+    #controls input {
+      width: 400px;
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; overflow: hidden; background-color: #000;">
+    <div id="controls">
+    <label for="shaderSelect">SHADER</label>
+    <select id="shaderSelect"></select>
+    <label id="failureLabel"></label>
+  </div>
+  <canvas id="full-canvas" style="border: none; width: 100vw; height: 100vh; display: block;"></canvas>
+  <script type="module">
+    import {initScene} from './shadertoy-loader.js';
+
+    const availableShaders = {  // TODO Fix 0 and 2
+      'test_0.glsl': {title: 'test_0'},
+      'test_1.glsl': {title: 'test_1'},
+      'test_2.glsl': {title: 'test_2'},
+    }
+
+    let [loading, lastFailed, teardownCallback, selectedShader] = [false, false, null, 'test_1.glsl'];
+
+    const shaderSelect = document.getElementById('shaderSelect');
+    Object.entries(availableShaders).forEach(([k, v]) => { shaderSelect.add(new Option(v.title, k)); });
+    shaderSelect.value = selectedShader;
+    shaderSelect.addEventListener('change', event => {
+      selectedShader = event.target.value; loadShader(selectedShader);
+    });
+
+    const setLoading = () => { loading = true; shaderSelect.disabled = true; }
+    const unsetLoading = (lastFailed) => {
+      loading = false; lastFailed = lastFailed; shaderSelect.disabled = false;
+      failureLabel.innerText = lastFailed ? 'SOMETHiNG WENT WRONG' : '';
+    }
+
+    // TODO space press to show and hide loader, document
+    const loadShader = async () => {
+      console.log('hello');
+      if(loading === true) { alert('Already loading a Shader'); return; }
+      setLoading();
+      if(teardownCallback) { teardownCallback(); teardownCallback = null; }
+      await fetch(`./frags/${selectedShader}`).then(r => {
+        if(!r.ok) throw new Error('fetched something not ok');  // TODO better error
+        return r.text();
+      }).then(responseText => {
+        const externalFrag = responseText;
+      
+        const fragFs0 = `precision mediump float; uniform vec2 iResolution; uniform vec2 iMouse; uniform float iTime;`;
+        const fragFs2 = `void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
+        const drawShaderFs = `${fragFs0}\n${externalFrag}\n${fragFs2}`;
+        const drawShaderVs = `attribute vec2 inPos; void main(){ gl_Position = vec4(inPos, 0.0, 1.0); }`;
+        
+        teardownCallback = initScene(document.getElementById("full-canvas"), drawShaderVs, drawShaderFs);
+        unsetLoading(false);
+      }).catch(r => { console.log('something went wrong'); unsetLoading(true); });  // TODO better error
+    }
+    loadShader(selectedShader);
+  </script>
+
+
+</body>
+</html>
