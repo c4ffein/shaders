@@ -41,12 +41,12 @@
     import {initScene} from './shadertoy-loader.js';
 
     const availableShaders = {  // TODO Fix 0 and 2
-      'test_0.glsl': {title: 'test_0'},
-      'test_1.glsl': {title: 'test_1'},
-      'test_2.glsl': {title: 'test_2'},
+      'test_0': {title: 'test_0', path: 'test_0.glsl'},
+      'test_1': {title: 'test_1', path: 'test_1.glsl'},
+      'test_2': {title: 'test_2', path: 'test_2.glsl'},
     }
 
-    const getShaderFromFragment = () => (f => availableShaders[f] ? f : 'test_1.glsl')(window.location.hash.slice(1));
+    const getShaderFromFragment = () => (f => availableShaders[f] ? f : 'test_1')(window.location.hash.slice(1));
     let [loading, lastFailed, teardownCallback, selectedShader] = [false, false, null, getShaderFromFragment()];
 
     const shaderSelect = document.getElementById('shaderSelect');
@@ -70,11 +70,10 @@
       }
     });
     const loadShader = async () => {
-      console.log('hello');
       if(loading === true) { alert('Already loading a Shader'); return; }
       setLoading();
       if(teardownCallback) { teardownCallback(); teardownCallback = null; }
-      await fetch(`./frags/${selectedShader}`).then(r => {
+      await fetch(`./frags/${availableShaders[selectedShader].path}`).then(r => {
         if(!r.ok) throw new Error(`Failed to load shader ${selectedShader}: ${r.status} ${r.statusText}`);
         return r.text();
       }).then(responseText => {
