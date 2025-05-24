@@ -37,13 +37,14 @@
       'test_2.glsl': {title: 'test_2'},
     }
 
-    let [loading, lastFailed, teardownCallback, selectedShader] = [false, false, null, 'test_1.glsl'];
+    const getShaderFromFragment = () => (f => availableShaders[f] ? f : 'test_1.glsl')(window.location.hash.slice(1));
+    let [loading, lastFailed, teardownCallback, selectedShader] = [false, false, null, getShaderFromFragment()];
 
     const shaderSelect = document.getElementById('shaderSelect');
     Object.entries(availableShaders).forEach(([k, v]) => { shaderSelect.add(new Option(v.title, k)); });
     shaderSelect.value = selectedShader;
     shaderSelect.addEventListener('change', event => {
-      selectedShader = event.target.value; loadShader(selectedShader);
+      selectedShader = event.target.value; window.location.hash = selectedShader; loadShader(selectedShader);
     });
 
     const setLoading = () => { loading = true; shaderSelect.disabled = true; }
