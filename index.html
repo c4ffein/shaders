@@ -80,10 +80,11 @@
       }).then(responseText => {
         const externalFrag = responseText;
       
-        const fragFs0 = `precision mediump float; uniform vec2 iResolution; uniform vec2 iMouse; uniform float iTime;`;
-        const fragFs2 = `void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
-        const drawShaderFs = `${fragFs0}\n${externalFrag}\n${fragFs2}`;
-        const drawShaderVs = `attribute vec2 inPos; void main(){ gl_Position = vec4(inPos, 0.0, 1.0); }`;
+        const fragFs0 = `precision mediump float; uniform vec2 iResolution; uniform vec2 iMouse; uniform float iTime;`
+        const fragFs1 = `out vec4 fragColor;`;
+        const fragFs3 = `void main(){ fragColor = vec4(1.0, 0.0, 0.0, 1.0); mainImage(fragColor, gl_FragCoord.xy); }`;
+        const drawShaderFs = `#version 300 es\n${fragFs0}\n${fragFs1}\n${externalFrag}\n${fragFs3}`;
+        const drawShaderVs = `#version 300 es\nin vec2 inPos; void main(){ gl_Position = vec4(inPos, 0.0, 1.0); }`;
         
         teardownCallback = initScene(document.getElementById("full-canvas"), drawShaderVs, drawShaderFs);
         unsetLoading(false);

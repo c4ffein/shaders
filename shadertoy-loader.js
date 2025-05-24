@@ -6,10 +6,12 @@
 // CC BY-SA 4.0 - Copyright (c) 2025 c4ffein
 // - refactored to be imported as a js module
 // - refactored to allow teardown
+// - switch to webgl2
+// - various improvements
 
 
 export function initScene(canvas, drawShaderVs, drawShaderFs) {
-  const gl = canvas.getContext('experimental-webgl');
+  const gl = canvas.getContext('webgl2');
   if (!gl)
     return;
   const mousepos = [0, 0];
@@ -23,8 +25,8 @@ export function initScene(canvas, drawShaderVs, drawShaderFs) {
     let status = gl.getShaderParameter(shaderObj, gl.COMPILE_STATUS);
     if (!status) alert(gl.getShaderInfoLog(shaderObj));
     gl.attachShader(progDraw, shaderObj);
-    gl.linkProgram(progDraw);
   }
+  gl.linkProgram(progDraw);
   status = gl.getProgramParameter(progDraw, gl.LINK_STATUS);
   if (!status) alert(gl.getProgramInfoLog(progDraw));
   progDraw.inPos = gl.getAttribLocation(progDraw, 'inPos');
