@@ -33,7 +33,7 @@
   <div id="controls">
     <label for="shaderSelect">SHADER</label>
     <select id="shaderSelect"></select>
-    <label id="failureLabel"></label>
+    <label id="failureLabel" style="color: #ff0000; font-weight: bold;"></label>
     <div style="margin-top: 10px; font-size: 12px; opacity: 0.8;">PRESS SPACEBAR TO SHOW/HIDE THIS MENU</div>
   </div>
   <canvas id="full-canvas" style="border: none; width: 100vw; height: 100vh; display: block;"></canvas>
@@ -75,7 +75,7 @@
       setLoading();
       if(teardownCallback) { teardownCallback(); teardownCallback = null; }
       await fetch(`./frags/${selectedShader}`).then(r => {
-        if(!r.ok) throw new Error('fetched something not ok');  // TODO better error
+        if(!r.ok) throw new Error(`Failed to load shader ${selectedShader}: ${r.status} ${r.statusText}`);
         return r.text();
       }).then(responseText => {
         const externalFrag = responseText;
@@ -87,7 +87,7 @@
         
         teardownCallback = initScene(document.getElementById("full-canvas"), drawShaderVs, drawShaderFs);
         unsetLoading(false);
-      }).catch(r => { console.log('something went wrong'); unsetLoading(true); });  // TODO better error
+      }).catch(error => { console.error('Error loading shader:', error.message || error);  unsetLoading(true); });
     }
     loadShader(selectedShader);
   </script>
