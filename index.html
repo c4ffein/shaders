@@ -5,19 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShaderToy Fullscreen Viewer</title>
   <style>
+    * { font-family: "Courier New", monospace; }
     #controls {
       position: fixed;
       top: 10px;
       left: 10px;
-      z-index: 100;
-      background: rgba(0, 0, 0, 0.5);
       padding: 10px;
+      z-index: 100;
       border-radius: 5px;
+      background: rgba(0, 0, 0, 0.5);
       color: white;
-      font-family: "Courier New", monospace;
     }
     #controls input {
       width: 400px;
+    }
+    #shaderSelect {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+      padding: 5px;
+      margin-left: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
     }
   </style>
 </head>
